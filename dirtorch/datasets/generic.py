@@ -6,6 +6,8 @@ import pickle
 import os.path as osp
 import json
 
+from dirtorch.datasets.downloader import DB_ROOT
+
 from .dataset import Dataset
 from .generic_func import *
 
@@ -29,6 +31,40 @@ class ImageList(Dataset):
     def get_key(self, i):
         return self.imgs[i]
 
+class ImageFolder(Dataset):
+    ''' Just a list of images (no labels, no query).
+
+    Input:  text file, 1 image path per row
+    '''
+    def __init__(self, img_list_path, root='', imgs=None):
+        self.root = root
+        if imgs is not None:
+            self.imgs = imgs
+        else:
+            img_list_path = DB_ROOT + img_list_path
+
+            print("search in: ", img_list_path)
+        
+            import os
+            filelist=os.listdir(img_list_path)
+            for fichier in filelist[:]: # filelist[:] makes a copy of filelist.
+                if not(fichier.endswith(".png")) and not(fichier.endswith(".jpg")):
+                    filelist.remove(fichier)
+                # else:
+                #     print(fichier)
+
+
+            self.imgs = [ img_list_path + "/" + e for e in filelist]
+            self.imgs = sorted(self.imgs)
+            # self.imgs = self.imgs[:2] 
+
+
+        self.nimg = len(self.imgs)
+        self.nclass = 0
+        self.nquery = 0
+
+    def get_key(self, i):
+        return self.imgs[i]
 
 class LabelledDataset (Dataset):
     """ A dataset with per-image labels

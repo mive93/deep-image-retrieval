@@ -55,7 +55,7 @@ def extract_image_features(dataset, transforms, net, ret_imgs=False, same_size=F
         torch.backends.cudnn.benchmark = False
 
     loader = get_loader(dataset, trf_chain=transforms, preprocess=net.preprocess, iscuda=iscuda,
-                        output=['img'], batch_size=batch_size, threads=threads, shuffle=False)
+                        output=['img', 'img_filename'], batch_size=batch_size, threads=threads, shuffle=False)
 
     if hasattr(net, 'eval'):
         net.eval()
@@ -64,9 +64,11 @@ def extract_image_features(dataset, transforms, net, ret_imgs=False, same_size=F
 
     img_feats = []
     trf_images = []
+    img_names = []
     with torch.no_grad():
         for inputs in tqdm.tqdm(loader, desc, total=1+(len(dataset)-1)//batch_size):
             imgs = inputs[0]
+            img_names.append(inputs[1])
             for i in range(len(imgs)):
                 if flip and flip.pop(0):
                     imgs[i] = imgs[i].flip(2)
@@ -91,7 +93,7 @@ def extract_image_features(dataset, transforms, net, ret_imgs=False, same_size=F
         if same_size:
             trf_images = torch.cat(trf_images, dim=0)
         return trf_images, img_feats
-    return img_feats
+    return img_names, img_feats
 
 
 def eval_model(db, net, trfs, pooling='mean', gemp=3, detailed=False, whiten=None,

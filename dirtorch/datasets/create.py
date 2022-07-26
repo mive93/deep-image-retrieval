@@ -21,6 +21,7 @@ class DatasetCreator:
             dataset_cmd += "()"
 
         try:
+            print("DATASET cmd: ", dataset_cmd)
             return eval(dataset_cmd)
         except NameError:
             import sys, inspect

@@ -21,6 +21,12 @@ import dirtorch.datasets.downloader as dl
 
 import pickle as pkl
 import hashlib
+import struct
+def bin_write(f, data):
+    data =data.flatten()
+    fmt = 'f'*len(data)
+    bin = struct.pack(fmt, *data)
+    f.write(bin)
 
 
 def extract_features(db, net, trfs, pooling='mean', gemp=3, detailed=False, whiten=None,
@@ -32,6 +38,8 @@ def extract_features(db, net, trfs, pooling='mean', gemp=3, detailed=False, whit
         query_db = db.get_query_db()
     except NotImplementedError:
         query_db = None
+
+    print("QUERY DB: ", query_db)
 
     # extract DB feats
     bdescs = []
@@ -47,7 +55,10 @@ def extract_features(db, net, trfs, pooling='mean', gemp=3, detailed=False, whit
         if query_db is not None:
             qdescs.append(bdescs[-1] if db is query_db
                           else test.extract_image_features(query_db, trfs, net, desc="query", **kw))
-
+    
+    files = bdescs[0][0]
+    bdescs = [bdescs[0][1]]
+    
     # pool from multiple transforms (scales)
     bdescs = tonumpy(F.normalize(pool(bdescs, pooling, gemp), p=2, dim=1))
     if query_db is not None:
@@ -57,6 +68,14 @@ def extract_features(db, net, trfs, pooling='mean', gemp=3, detailed=False, whit
         bdescs = common.whiten_features(bdescs, net.pca, **whiten)
         if query_db is not None:
             qdescs = common.whiten_features(qdescs, net.pca, **whiten)
+
+    for i in range(len(files)):
+        out_file = files[i][0] + ".emb"
+        of = open(out_file, 'wb')
+
+        d = bdescs[i, :]
+        bin_write(of, d)
+
 
     mkdir(output, isfile=True)
     if query_db is db or query_db is None:
