@@ -14,7 +14,7 @@ def download_dataset(dataset):
         dir_name = 'oxford5k'
     elif dataset in ('paris6k', 'rparis6k'):
         src_dir = 'http://www.robots.ox.ac.uk/~vgg/data/parisbuildings'
-        dl_files = ['paris_1.tgz', 'paris_2.tgz']
+        dl_files = ['paris_1-v1.tgz', 'paris_2-v1.tgz']
         dir_name = 'paris6k'
     else:
         raise ValueError('Unknown dataset: {}!'.format(dataset))

@@ -24,9 +24,9 @@ def create(cmd_line, to_tensor=False, **vars):
     '''
     if to_tensor:
         if not cmd_line:
-            cmd_line = "ToTensor(), Normalize(mean=mean, std=std)"
+            cmd_line = "ToTensor(), Resize([input_size,input_size]), Normalize(mean=mean, std=std)"
         elif to_tensor and 'ToTensor' not in cmd_line:
-            cmd_line += ", ToTensor(), Normalize(mean=mean, std=std)"
+            cmd_line += ", ToTensor(), Normalize(mean=mean, std=std), T.Resize(input_size)"
 
     assert isinstance(cmd_line, str)
 
@@ -621,6 +621,10 @@ class ToTensor (StillTransform, tvf.ToTensor):
 class Normalize (StillTransform, tvf.Normalize):
     def _transform(self, img):
         return tvf.Normalize.__call__(self, img)
+
+class Resize (StillTransform, tvf.Resize):
+    def _transform(self, img):
+        return tvf.Resize.__call__(self, img)
 
 
 class BBoxToPixelLabel (object):

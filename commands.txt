@@ -1,0 +1,2 @@
+python -m dirtorch.test_dir --dataset RParis6K --checkpoint $DB_ROOT/Resnet-101-AP-GeM.pt --whiten Landmarks_clean --whitenp 0.25 --gpu 0
+python -m dirtorch.extract_features --dataset 'ImageList("/home/micaela/repos/deep-image-retrieval/data/test.txt")' --checkpoint $DB_ROOT/Resnet-101-AP-GeM.pt --output test.npy --whiten Landmarks_clean --whitenp 0.25 --gpu 0
